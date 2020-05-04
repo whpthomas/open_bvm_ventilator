@@ -2,12 +2,19 @@
 
 This is the bill of materials for the [Open BVM Ventilator](https://github.com/whpthomas/open_bvm_ventilator) project. Where possible I have chosen widely available common off-the-shelf (COTS) components. However the machine screws I used are metric which may be harder to source in North America.
 
+## Medical Supplies
+
+Part|Description|Quantity
+----|----|----
+![Laerdal Bag II](Laerdal-Bag-II.jpg)|Laerdal Bag II, LSR, or equivalent adult sized bag valve mask hand  resuscitator (e.g. Ambu Bag).|1
+![PEEP Valve](peep-valve.jpg)|PEEP Valve (5-20 cm H2O).|1
+![Extension Tube](extension-tube.jpg)|Silicone Extension Tube.|1
+
 ## Hardware
 
 Part|Description|Quantity
 ----|----|----
-![Laerdal Bag II](Laerdal-Bag-II.jpg)|Laerdal Bag II - or equivalent adult sized bag valve mask hand ventilator (e.g. Ambu Bag).|1
-![Silicon Hose](silicon-hose.jpg)|5mm OD x 3mm ID x 250mm long food grade silicon hose.|250cm
+![Silicon Hose](silicon-hose.jpg)|5mm OD x 3mm ID x 250mm L food grade silicon hose.|1
 ![Hose Fitting](4mm_1-8_BSP-hose-barb.jpg)|1/8" BSP to 4mm barb hose fitting. This barb protrudes from the back of the housing base and is used to connect the manifold hose to the pressure sensor.|1
 ![Bearing](608-2RS-bearing.jpg)|608-2RS 22mm OD x 8mm ID x 7mm W skate bearings.|11
 ![M3x6mm Machine Screws](M3x6mm-socket-cap.jpg)|M3 x 6mm stainless socket head cap screws are used to attach the stepper motor to the ring mount, and the Arduino Uno, stepper driver and endstop circuit boards to the base.|13
