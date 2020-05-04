@@ -3,6 +3,9 @@
 //  Created by WHPThomas <me(at)henri(dot)net> on 20/02/20.
 //  Copyright (c) 2020 WHPThomas
 //
+//  See: AVR446: Linear speed control of stepper motor
+//       8-bit AVR Microcontrollers Application Note
+//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or

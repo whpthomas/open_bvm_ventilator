@@ -71,8 +71,27 @@ The firmware is dependent on the following libraries:
 
 The factory reset function found on the System Page should be selected the first time the system is run to set all the EEPROM control variables to know values.
 
+### Global compile-time options
+
+In all my code I use the `options.h` compile time header to locally configure global parameters in external libraries. While this feature is only being used for debugging in the current project, this may change in the future releases.
+
+#### The setup procedure...
+
+1. In the `~/Library/ArduinoXX/packages` folder identify the packages you are targeting with tis code (i.e. `/arduino`).
+
+2. For each target package locate the `./hardware/avr/v.v.v/platform.txt` file and
+change the following line: `build.extra_flags=` to: `build.extra_flags=-I "{build.source.path}" -include options.h`
+
+3. In the `~/Library/ArduinoXX/packages\...\hardware\avr\v.v.v\cores\arduino` directory create an empty file called `options.h`
+
+4. Inside your sketch create a file called `options.h` that contains the global library declarations you want to customise locally in that sketch.
+
 ![Open BVM Ventilator Rear](images/rear.jpg)
 
 ## Electronics
 
 The ventilator control shield is currently being schematically captured and will be published shortly. It will allow all the electronic components to be easily connected.
+
+# TERMS OF USE
+
+Open BVM Ventilator reference designs are intended for educational purposes, ARE NOT CERTIFIED FOR MEDICAL USE, ARE PROVIDED "AS IS" AND "WITH ALL FAULTS. Dr. Henry Thomas DISCLAIMS ALL OTHER WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Dr. Henry Thomas may make changes to reference design specifications and descriptions at any time, without notice.
