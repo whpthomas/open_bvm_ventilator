@@ -1,0 +1,142 @@
+solid Uranium STLWriter Sun 03 May 2020 14:05:00
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 -2.5 8.660255432128906
+    vertex -14.0 -5.0 4.330127716064453
+    vertex 14.0 -2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -2.5 8.660255432128906
+    vertex -14.0 -5.0 4.330127716064453
+    vertex 14.0 -5.0 4.3301286697387695
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 2.5 8.660255432128906
+    vertex -14.0 -2.5 8.660255432128906
+    vertex 14.0 2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 2.5 8.660255432128906
+    vertex -14.0 -2.5 8.660255432128906
+    vertex 14.0 -2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 5.0 4.330127716064453
+    vertex -14.0 2.5 8.660255432128906
+    vertex 14.0 5.0 4.3301286697387695
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 5.0 4.3301286697387695
+    vertex -14.0 2.5 8.660255432128906
+    vertex 14.0 2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 2.5 4.76837158203125e-07
+    vertex -14.0 5.0 4.330127716064453
+    vertex 14.0 2.5 1.430511474609375e-06
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 2.5 1.430511474609375e-06
+    vertex -14.0 5.0 4.330127716064453
+    vertex 14.0 5.0 4.3301286697387695
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 -2.5 4.76837158203125e-07
+    vertex -14.0 2.5 4.76837158203125e-07
+    vertex 14.0 -2.5 1.430511474609375e-06
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -2.5 1.430511474609375e-06
+    vertex -14.0 2.5 4.76837158203125e-07
+    vertex 14.0 2.5 1.430511474609375e-06
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 -5.0 4.330127716064453
+    vertex -14.0 -2.5 4.76837158203125e-07
+    vertex 14.0 -5.0 4.3301286697387695
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -5.0 4.3301286697387695
+    vertex -14.0 -2.5 4.76837158203125e-07
+    vertex 14.0 -2.5 1.430511474609375e-06
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 -2.5 4.76837158203125e-07
+    vertex -14.0 -5.0 4.330127716064453
+    vertex -14.0 2.5 4.76837158203125e-07
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 2.5 4.76837158203125e-07
+    vertex -14.0 -5.0 4.330127716064453
+    vertex -14.0 5.0 4.330127716064453
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 5.0 4.330127716064453
+    vertex -14.0 -5.0 4.330127716064453
+    vertex -14.0 -2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex -14.0 5.0 4.330127716064453
+    vertex -14.0 -2.5 8.660255432128906
+    vertex -14.0 2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -2.5 1.430511474609375e-06
+    vertex 14.0 5.0 4.3301286697387695
+    vertex 14.0 -5.0 4.3301286697387695
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -5.0 4.3301286697387695
+    vertex 14.0 5.0 4.3301286697387695
+    vertex 14.0 2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -5.0 4.3301286697387695
+    vertex 14.0 2.5 8.660255432128906
+    vertex 14.0 -2.5 8.660255432128906
+  endloop
+endfacet
+facet normal 0.0 0.0 0.0
+  outer loop
+    vertex 14.0 -2.5 1.430511474609375e-06
+    vertex 14.0 2.5 1.430511474609375e-06
+    vertex 14.0 5.0 4.3301286697387695
+  endloop
+endfacet
+endsolid Uranium STLWriter Sun 03 May 2020 14:05:00
