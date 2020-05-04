@@ -47,7 +47,7 @@ These capabilities have been verified with static tests but will require more co
 
 ## Hardware
 
-![Open BVM Ventilator Hardware](cad/Bag Press IV v12b.jpg)
+![Open BVM Ventilator Hardware](images/hardware.jpg)
 
 The Open BVM Ventilator is comprised of 25 x 3D printed parts and various off-the-shelf hardware, electronic components and fasteners.
 
@@ -55,6 +55,8 @@ A list of all the required hardware, fasteners, electronic components and 3D pri
 
 ## Firmware
 
-## Arduino Uno Shield
+The firmware can be downloaded, compiled and uploaded using the Arduino IDE. The factory reset function found on the System Page should be selected the first time the system is run to set all the EEPROM control variables to know values.
 
-This repository contains the Arduino firmware source code, 3D printable STL files,  original CAD files, electronic circuit and bill of materials.
+## Electronics
+
+The ventilator control shield is currently being schematically captured and will be published shortly.
