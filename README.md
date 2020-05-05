@@ -90,7 +90,32 @@ change the following line: `build.extra_flags=` to: `build.extra_flags=-I "{buil
 
 ## Electronics
 
-The ventilator control shield is currently being schematically captured and will be published shortly. It will allow all the electronic components to be easily connected.
+Schematic capture of the control shield for Arduino Uno can be found at [easyeda.com/whpthomas/open-bvm-ventilator-shield](https://easyeda.com/whpthomas/open-bvm-ventilator-shield). The shield has been designed to allow all the electronic components to be easily connected using either Dupont connectors or by directly soldered wires. The circuit supports use of either the TB6560 or A4988 (or compatible) stepstick driver.
+
+![Arduino Uno Shield](pcb/Shield_PCB.jpg)
+
+Fully assembled boards can be ordered directly from [JLCPCB](https://jlcpcb.com/), [PCBWay](https://www.pcbway.com/) or other suitable PCB prototyping services using the Gerber files, bill of materials and pick and place files found in the [`/pcb`](https://github.com/whpthomas/open_bvm_ventilator/tree/master/pcb) folder.
+
+The following ATMega328 pins on the Arduino Uno are used in this schematic:
+
+2. Controller Rotary Encoder A (Interrupt 0)
+3. Controller Rotary Encoder B (Interrupt 1)
+4. Controller Rotary Encoder Button
+5. Controller Buzzer
+6. Controller Stop Button
+7. LED Red
+8. LED Green
+9. LED Blue
+10. LCD Chip Select (SS)
+11. LCD Data In (MOSI)
+12. *No Connection*
+13. LCD Clock (SCK)
+14. Home Endstop
+15. Stepper Driver Step
+16. Stepper Driver Direction
+17. Stepper Driver Enable
+18. BME280 Pressure Sensor IC2 SDA
+19. BME280 Pressure Sensor IC2 SCK
 
 # TERMS OF USE
 
