@@ -26,7 +26,7 @@ In order to meet all the requirements in the above document it is assumed that:
 
 The current Open BVM Ventilator design has the following capabilities:
 
-* A real time system where all controls can be adjusted and provide live feedback though mechanical output and the user interface.
+* A real time system where all controls are adjustable and provide live feedback though mechanical output and the user interface.
 * Minute Volume (Mv) and Peak Inspiratory Pressure (Pip) is displayed after each respiratory cycle.
 * Pressure-limited mandatory ventilation is controlled via the Respiratory Rate (Rr) and Tidal Volume (Vt).
 * Spontaneous ventilation is triggered via negative pressure on the manifold attached to the pressure sensor (Controls page / Trigger Pressure). 
@@ -35,7 +35,7 @@ The current Open BVM Ventilator design has the following capabilities:
 * Airway pressure safety is set via the maximum pressure limit (Limits page / Pressure / Maximum).
 * Pressurised air is not required, therefore the unit can be operated outside of an ICU using only bottled oxygen and a power supply.
 * All ventilator controls are accessed via the LCD display, stop button and encoder on the [Reprap Discount Full Graphic Smart Controller](https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller).
-* Both visual and audible alarms are generated and logged on the events page.
+* Both visual and audible alarms are generated and logged on the Events page.
 * 12v power can be provided via an AC adapter or external battery.
 * All parts can be 3D printed with food safe PLA plastic.
 
@@ -61,7 +61,7 @@ A list of all the required hardware, fasteners, electronic components and 3D pri
 
 The firmware features a real time model view controller architecture with custom stepper speed control that supports linear acceleration with rpm adjustment inside position changes.
 
-The firmware can be downloaded, compiled and uploaded using the Arduino IDE. 
+The firmware can be downloaded, compiled and uploaded to the Arduino Uno board using the [Arduino IDE](https://www.arduino.cc/). 
 
 The firmware is dependent on the following libraries:
 
@@ -90,32 +90,65 @@ change the following line: `build.extra_flags=` to: `build.extra_flags=-I "{buil
 
 ## Electronics
 
-Schematic capture of the control shield for Arduino Uno can be found at [easyeda.com/whpthomas/open-bvm-ventilator-shield](https://easyeda.com/whpthomas/open-bvm-ventilator-shield). The shield has been designed to allow all the electronic components to be easily connected using either Dupont connectors or by directly soldered wires. The circuit supports use of either the TB6560 or A4988 (or compatible) stepstick driver.
-
-![Arduino Uno Shield](pcb/Shield_PCB.jpg)
+Schematic capture of a control shield for the Arduino Uno can be found at [easyeda.com/whpthomas/open-bvm-ventilator-shield](https://easyeda.com/whpthomas/open-bvm-ventilator-shield). The shield has been designed to allow all the electronic components to be easily connected using either Dupont connectors or by directly soldered wires. The circuit supports use of either the TB6560 or A4988 (or compatible) stepstick driver.
 
 Fully assembled boards can be ordered directly from [JLCPCB](https://jlcpcb.com/), [PCBWay](https://www.pcbway.com/) or other suitable PCB prototyping services using the Gerber files, bill of materials and pick and place files found in the [`/pcb`](https://github.com/whpthomas/open_bvm_ventilator/tree/master/pcb) folder.
 
-The following ATMega328 pins on the Arduino Uno are used in this schematic:
+![Arduino Uno Shield](pcb/Shield_PCB.jpg)
 
-2. Controller Rotary Encoder A (Interrupt 0)
-3. Controller Rotary Encoder B (Interrupt 1)
-4. Controller Rotary Encoder Button
-5. Controller Buzzer
-6. Controller Stop Button
-7. LED Red
-8. LED Green
-9. LED Blue
-10. LCD Chip Select (SS)
-11. LCD Data In (MOSI)
-12. *No Connection*
-13. LCD Clock (SCK)
-14. Home Endstop
-15. Stepper Driver Step
-16. Stepper Driver Direction
-17. Stepper Driver Enable
-18. BME280 Pressure Sensor IC2 SDA
-19. BME280 Pressure Sensor IC2 SCK
+The following digital pins on the Arduino Uno are used in the [schematic](https://github.com/whpthomas/open_bvm_ventilator/blob/master/pcb/Shield_SCH-v1.pdf):
+
+* **2** Controller Rotary Encoder A (Interrupt 0)
+* **3** Controller Rotary Encoder B (Interrupt 1)
+* **4** Controller Rotary Encoder Button
+* **5** Controller Buzzer
+* **6** Controller Stop Button
+* **7** LED Red
+* **8** LED Green
+* **9** LED Blue
+* **10** LCD Chip Select (SS)
+* **11** LCD Data In (MOSI)
+* **13** LCD Clock (SCK)
+* **A0** Home Endstop
+* **A1** Stepper Driver Step
+* **A2** Stepper Driver Direction
+* **A3** Stepper Driver Enable
+* **A4** BME280 Pressure Sensor IC2 SDA
+* **A5** BME280 Pressure Sensor IC2 SCK
+
+#### A4988 Jumper Settings
+
+Jumpers are used on the MSJ header to set the microstep resolution. The default software configuration is to place a jumper across MS1 and MS2 for 1/8 microstep resolution.
+
+MS1|MS2|MS3|Microstep Resolution
+----|----|----|----
+Low|Low|Low|Full step
+High|Low|Low|1/2 step
+Low|High|Low|1/4 step
+High|High|Low|1/8 step
+High|High|High|1/16 step
+
+#### TB6560 Switch Configuration
+
+Switches are used on the TB6560 stepper driver to set the current and microstep resolution.
+
+![TB6560 Configuration](images/TB6560-config.jpg)
+
+I recommend configuring the TB6560 with the following settings.
+
+Switch|State|Configuration
+----|----|----
+SW1|ON|1.2A
+SW2|OFF|1.2A
+SW3|OFF|1.2A
+S1|ON|1.2A
+S2|OFF|50% Stop Current
+S3|ON|1/8 steps
+S4|ON|1/8 steps
+S5|OFF|50% Delay
+S6|ON|50% Delay
+
+----
 
 # TERMS OF USE
 
