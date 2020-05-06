@@ -6,9 +6,10 @@ This is the bill of materials for the [Open BVM Ventilator](https://github.com/w
 
 Part|Description|Quantity
 ----|----|----
-![Laerdal Bag II](Laerdal-Bag-II.jpg)|Laerdal Bag II, LSR, or equivalent adult sized bag valve mask hand  resuscitator (e.g. Ambu Bag).|1
-![PEEP Valve](peep-valve.jpg)|PEEP Valve (5-20 cm H2O).|1
-![Extension Tube](extension-tube.jpg)|Silicone Extension Tube.|1
+![Laerdal Bag II](Laerdal-Bag-II.jpg)|[Laerdal Bag II](https://www.laerdal.com/au/item/845111), [LSR](https://www.laerdal.com/au/item/87005133), or equivalent adult sized bag valve mask hand  resuscitator (e.g. Ambu Bag).|1
+![PEEP Valve](peep-valve.jpg)|[PEEP Valve](https://www.laerdal.com/au/item/845240) (5-20 cm H2O).|1
+![HEPA Filter](filter.jpg)|HEPA Filter.|1
+![Extension Tube](extension-tube.jpg)|[Silicone Extension Tube](https://www.laerdal.com/au/item/871000).|1
 
 ## Hardware
 
@@ -18,8 +19,8 @@ Part|Description|Quantity
 ![Hose Fitting](4mm_1-8_BSP-hose-barb.jpg)|1/8" BSP to 4mm barb hose fitting. This barb protrudes from the back of the housing base and is used to connect the manifold hose to the pressure sensor.|1
 ![Bearing](608-2RS-bearing.jpg)|608-2RS 22mm OD x 8mm ID x 7mm W skate bearings.|11
 ![M3x6mm Machine Screws](M3x6mm-socket-cap.jpg)|M3 x 6mm stainless socket head cap screws are used to attach the stepper motor to the ring mount, and the Arduino Uno, stepper driver and endstop circuit boards to the base.|13
-![M3x12mm Machine Screws](M3x12mm-socket-cap.jpg)|M3 x 12mm stainless  socket head cap screws are used to attach the interface front cover to the interface panel.|4
-![M3x16mm Machine Screws](M3x16mm-socket-cap.jpg)|M3 x 16mm stainless  socket head cap screws are used to attach the [Reprap Discount Full Graphic Smart Controller](https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller) to the interface panel.|2
+![M3x12mm Machine Screws](M3x12mm-socket-cap.jpg)|M3 x 12mm stainless socket head cap screws are used to attach the interface front cover to the interface panel.|4
+![M3x16mm Machine Screws](M3x16mm-socket-cap.jpg)|M3 x 16mm stainless socket head cap screws are used to attach the [Reprap Discount Full Graphic Smart Controller](https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller) to the interface panel.|2
 ![M4x12mm Countersink Screws](M4x12mm-countersink.jpg)|M4 x 12mm stainless countersink screws are used to assemble the cradle, hinges and main housing.|13
 ![M4x16mm Machine Screws](M4x16mm-socket-cap.jpg)|M4 x 16mm stainless socket head cap screws are used to assemble the planetary gear module and attache it to the housing.|12
 ![M8x16mm Machine Screws](M8x20mm-socket-cap.jpg)|M8 x 16mm stainless socket head cap screws are used to attach bearings to the planet intermediate carrier to gang 1, bearings the planetary output carrier to gang 2 and bearings to the tie rod between the planetary output and press arm.|10
