@@ -63,8 +63,10 @@ void ctrl_start_position(unsigned value) {
   ctrl.startPosition = value;
   //DebugMessage("ctrl.startPosition = ", ctrl.startPosition);
   live_full_press_steps();
+#ifdef TORQUE_RAMP
   live_400_steps();
   live_600_steps();
+#endif
 }
 
 /* PRESS VOLUME
@@ -77,8 +79,10 @@ void ctrl_full_press_volume(unsigned value) {
   //DebugMessage("ctrl.fullPressVolume = ", ctrl.fullPressVolume);
   live_tital_steps();
   live_volume_per_revolution();
+#ifdef TORQUE_RAMP
   live_400_steps();
   live_600_steps();
+#endif
 }
 
 /* TIDAL VOLUME
@@ -223,8 +227,10 @@ void live_full_press_steps() {
   //DebugMessage("live.fullPressSteps = ", live.fullPressSteps);
   live_tital_steps();
   live_volume_per_revolution();
+#ifdef TORQUE_RAMP
   live_400_steps();
   live_600_steps();
+#endif
 }
 
 int clamp_input_value(int value, int step, int8_t dir, int lo, int hi) {

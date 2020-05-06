@@ -10,14 +10,14 @@ The Open BVM Ventilator is non-invasive and operates in universal mode (spontane
 
 ### Assumptions
 
-At the time this design was initiated it was assumed that early non-invasive ventilation with supplementary oxygen is a beneficial treatment for COVID-19 patients.
+At the time this design was initiated it was assumed that early non-invasive ventilation with supplementary oxygen is beneficial for treating COVID-19 patients.
 
 In order to meet all the requirements in the above document it is assumed that:
 
 1. Supplementary oxygen will be provided to the bag via an externally regulated source (i.e. an oxygen cylinder or wall outlet).
-2. A HEPA exhalation filter will be installed between the manifold and mask.
-3. A PEEP regulator will be installed on the valve output to provide positive end-expiratory pressure.
-4. An extension hose may be used to connect the mask to the patient. However if used, the extension hose should be connected between the bag and the valve to limit the amount of dead space in the gas exchange.
+2. A [HEPA exhalation filter](bom/BOM.md) will be installed between the manifold and mask.
+3. A [PEEP regulator](bom/BOM.md) will be installed on the valve output to provide positive end-expiratory pressure.
+4. An [extension hose](bom/BOM.md) may be used to connect the mask to the patient. However if used, the extension hose should be connected between the bag and the valve to limit the amount of dead space in the gas exchange.
 5. The mask will be strapped to patient in order to provide a hands free airtight seal.
 
 ![Open BVM Ventilator Interface](images/interface.jpg)
@@ -26,11 +26,12 @@ In order to meet all the requirements in the above document it is assumed that:
 
 The current Open BVM Ventilator design has the following capabilities:
 
-* A real time system where all controls are adjustable and provide live feedback though mechanical output and the user interface.
-* Minute Volume (Mv) and Peak Inspiratory Pressure (Pip) is displayed after each respiratory cycle.
+* Respiratory air and oxygen is fed through a bag valve mask (Ambu bag) which is an approved medical device for hand resuscitation. The pressure sensor manifold is 3D printed with food grade PLA.
+* All controls are adjustable in real time and provide live feedback though mechanical output and the user interface.
+* Minute Volume (Mv) and Peak Inspiratory Pressure (Pip) are displayed after each respiratory cycle.
 * Pressure-limited mandatory ventilation is controlled via the Respiratory Rate (Rr) and Tidal Volume (Vt).
-* Spontaneous ventilation is triggered via negative pressure on the manifold attached to the pressure sensor (Controls page / Trigger Pressure). 
-* Positive end expiratory pressure (PEEP) is provided by a regulator attached to the valve output.
+* Spontaneous ventilation is triggered via negative pressure on the the pressure sensor attached to the manifold (Controls page / Trigger Pressure). 
+* Positive end expiratory pressure (PEEP) is provided by a [regulator](bom/BOM.md) attached to the valve output.
 * Quick adjustment of Tidal Volume (Vt), Respiratory Rate (Rr) and Plateau Airway Pressure (Paw) is available on the user interface main page.
 * Airway pressure safety is set via the maximum pressure limit (Limits page / Pressure / Maximum).
 * Pressurised air is not required, therefore the unit can be operated outside of an ICU using only bottled oxygen and a power supply.
@@ -39,15 +40,15 @@ The current Open BVM Ventilator design has the following capabilities:
 * 12v power can be provided via an AC adapter or external battery.
 * All parts can be 3D printed with food safe PLA plastic.
 
-These capabilities have been verified with static tests but will require more comprehensive dynamic testing to be considered validated. These dynamic tests are underway, however they require at least 14 days to complete.
+These capabilities have been verified with static tests using a manometer but will require more comprehensive dynamic testing to be considered validated. These dynamic tests are underway, however they require at least 14 days to complete.
 
 ![Open BVM Ventilator Drive](images/drive.jpg)
 
 ### Outstanding Issues
 
-1. The actual tidal volume is currently estimated and needs calibration.
+1. The actual tidal volume is currently estimated and needs calibration - this will be resolved shortly.
 2. Maximum inspiratory and expiratory flow is limited to 35 l/min by the maximum stepper motor RPM and torque. This may or may not be adequate for clinical use and therefore may require selection of a different stepper motor and driver combination to achieve the 100 l/min capability specified.
-3. The current stepper driver is noisy and should to be replaced with a TMC2209 or equivalent. However this would require a cooling fan.
+3. The current stepper driver is noisy and will to be replaced with a TMC2209. However this would require an active cooling fan.
 
 ## Hardware
 
@@ -70,21 +71,6 @@ The firmware is dependent on the following libraries:
 * [U8g2lib](https://github.com/olikraus/u8g2)
 
 The factory reset function found on the System Page should be selected the first time the system is run to set all the EEPROM control variables to know values.
-
-### Global compile-time options
-
-In all my code I use the `options.h` compile time header to locally configure global parameters in external libraries. While this feature is only being used for debugging in the current project, this may change in the future releases.
-
-#### The setup procedure...
-
-1. In the `~/Library/ArduinoXX/packages` folder identify the packages you are targeting with tis code (i.e. `/arduino`).
-
-2. For each target package locate the `./hardware/avr/v.v.v/platform.txt` file and
-change the following line: `build.extra_flags=` to: `build.extra_flags=-I "{build.source.path}" -include options.h`
-
-3. In the `~/Library/ArduinoXX/packages\...\hardware\avr\v.v.v\cores\arduino` directory create an empty file called `options.h`
-
-4. Inside your sketch create a file called `options.h` that contains the global library declarations you want to customise locally in that sketch.
 
 ![Open BVM Ventilator Rear](images/rear.jpg)
 

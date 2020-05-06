@@ -17,6 +17,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
+#include "options.h"
 #include "StepperSpeedControl.h"
 
 const float GEAR_RATIO = 5.33; // SUN = 9 Teeth, PLANETS = 15 Teeth
@@ -174,15 +175,18 @@ struct live_t {
   unsigned minuteVentilation; // 3000-8000 ml/min
 
   int zeroPressure;
-  int basePressure;
   int peakPressure;
 
   unsigned inspiratoryRpm;
   unsigned expiratoryRpm;
   unsigned fullPressSteps;
   unsigned tidalSteps;
+
+#ifdef TORQUE_RAMP
   unsigned _400Steps;
   unsigned _600Steps;
+#endif
+
   byte rpmRamp;
   bool audibleAlarm;
 };
@@ -209,8 +213,11 @@ void actual_minute_ventilation();
 void live_full_press_steps();
 unsigned tidal_steps(unsigned volume);
 inline void live_tital_steps() { live.tidalSteps = tidal_steps(ctrl.tidalVolume); }
+
+#ifdef TORQUE_RAMP
 inline void live_400_steps() { live._400Steps = ctrl.startPosition + tidal_steps(400); }
 inline void live_600_steps() { live._600Steps = ctrl.startPosition + tidal_steps(600); }
+#endif
 
 int clamp_input_value(int value, int step, int8_t dir, int lo, int hi);
 

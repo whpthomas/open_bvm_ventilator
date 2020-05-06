@@ -23,7 +23,6 @@
 #include <Wire.h>
 #include <avr/wdt.h>
 
-#include "options.h"
 #include "Pins.h"
 #include "ButtonDebouncer.h"
 #include "Control.h"
@@ -52,7 +51,7 @@ BME280I2C bme(settings);
 void select_home_page();
 int read_pressure();
 void update_pressure();
-void adjust_rpm();
+void check_pressure();
 
 void setup() {
   IF_DEBUG( debug.begin(115200); )
@@ -68,7 +67,7 @@ void setup() {
     delay(1000);    
   }
   delay(500);
-  live.basePressure = live.zeroPressure = read_pressure();
+  live.zeroPressure = read_pressure();
 
   IF_DEBUG( debug.println("Started"); )
   fastPinMode(ROTARY_BUTTON_PIN, INPUT_PULLUP);
@@ -258,8 +257,7 @@ void loop()
           move_to_position(ctrl.startPosition + live.tidalSteps, live.inspiratoryRpm, false);
           while(!stp.done) {
             live.pressure = read_pressure();
-            if(live.basePressure == 0) live.zeroPressure = live.basePressure = live.pressure;
-            adjust_rpm();
+            check_pressure();
             if(redrawTimer < now) {
               redrawTimer = now + 200; 
               update_pressure();
@@ -361,7 +359,9 @@ void loop()
         green_led();
         break;
       case ZERO_PHASE:
+        break;
       default:
+        phase = HOME_PHASE;
         break;
     }
     home_stop();
@@ -397,6 +397,7 @@ void loop()
  
     case ZERO_PHASE:
       if(stp.done) {
+        live.zeroPressure = read_pressure();
         phase = NO_PHASE;
         redraw = true;
       }
@@ -404,7 +405,6 @@ void loop()
 
     case NO_PHASE:
       if(!ctrl.ventilationActive) break;
-      live.zeroPressure = live.basePressure = live.pressure;
       lastBreathCycle = now - live.breathCycleTime;
       green_led();
       redraw = true;
@@ -413,7 +413,6 @@ void loop()
     case TRIGGER_PHASE:
       if(stp.done) {
         live.rpmRamp = 0;
-        if(live.basePressure == 0) live.zeroPressure = live.basePressure = live.pressure;
         if(!alarm) green_led();
         if(live.zeroPressure - live.pressure >= ctrl.triggerPressure || breathCycleTimer < now) {  // if negative trigger pressure or timed breath
           if(!ctrl.ventilationActive) { // check ventilation still active
@@ -441,7 +440,7 @@ void loop()
       break;
 
     case CYCLING_PHASE:
-      adjust_rpm();
+      check_pressure();
       if(stp.done) {
         if(!alarm) cyan_led();
         if(inspiratoryTimer < now) {
@@ -460,7 +459,6 @@ void loop()
     case EXPIRATORY_PHASE:
       move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
       phase = TRIGGER_PHASE;
-      live.basePressure = 0;
       redraw = true;
       break;
   }
@@ -527,7 +525,7 @@ void update_pressure()
 
 #define RAMP_MAX 3
 
-void adjust_rpm()
+void check_pressure()
 {
   int pressure = live.pressure - live.zeroPressure;
   if(live.peakPressure < pressure) live.peakPressure = pressure;
@@ -535,6 +533,7 @@ void adjust_rpm()
     update_rpm(0, false); // ramp down stepper motor
     live.rpmRamp = RAMP_MAX;
   }
+#ifdef TORQUE_RAMP
   else {
     switch(live.rpmRamp) {
       case 0:
@@ -551,4 +550,5 @@ void adjust_rpm()
         break;
     }
   }
+#endif
 }

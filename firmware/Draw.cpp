@@ -125,7 +125,6 @@ void draw_message(byte x, byte y, const __FlashStringHelper *message)
 
 void draw_alert()
 {
-  char c = ' ';
   const __FlashStringHelper *message = NULL;
   const __FlashStringHelper *dir = NULL;
   const __FlashStringHelper *key = NULL;
@@ -136,47 +135,35 @@ void draw_alert()
   switch(phase) {
     case HOME_PHASE:
       message = F("Started");
-      c = 'S';
       break;
     case ENDSTOP_PHASE:
-      message = F("Homing");
-      c = 'H';
-      break;
     case ZERO_PHASE:
-      message = F("Zeroing");
-      c = 'Z';
+      message = F("Homing");
       break;    
     case NO_PHASE:
       message = F("Ready");
-      c = 'R';
       break;
     case TRIGGER_PHASE:
       if(stp.done) {
         message = F("Trigger");
-        c = 'T';
       }
       else {
         message = F("Expiration");
-        c = 'E';
       }
       break;
     case INSPIRATORY_PHASE:
       message = F("Inspiration");
-      c = 'I';
       break;
     case CYCLING_PHASE:
       if(stp.done) {
         message = F("Cycling");
-        c = 'C';
       }
       else {
         message = F("Inspiration");
-        c = 'I';
       }
       break;
     case EXPIRATORY_PHASE:
       message = F("Expiration");
-      c = 'E';
       break;
   }
   
@@ -212,8 +199,6 @@ void draw_alert()
       key = F("Vt");
       break;
   }
-  u8g2.print(c);
-  u8g2.setCursor(74, 18 + SMLH);
   u8g2.print(dir);
   u8g2.setCursor(u8g2.tx + 2, 18 + SMLH);
   u8g2.print(key);
