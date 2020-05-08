@@ -17,25 +17,27 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
+#include "vlimits.h"
 #include "options.h"
 #include "StepperSpeedControl.h"
 
 const float GEAR_RATIO = 5.33; // SUN = 9 Teeth, PLANETS = 15 Teeth
 const float GANG_RATIO = GEAR_RATIO * GEAR_RATIO;
-const float PRESS_RATIO = 90 / 360.0;
-const unsigned END_POSITION = (STEPS_PER_REVOLUTION * GANG_RATIO * PRESS_RATIO);
+const float STEPS_PER_ROTATION = STEPS_PER_REVOLUTION * GANG_RATIO;
+const float FULL_PRESS_RATIO = 140 / 360.0;
+const unsigned END_POSITION = (STEPS_PER_ROTATION * FULL_PRESS_RATIO);
 
 enum page_t {
   HOME_PAGE,
   SELECT_PAGE,
+  EVENTS_PAGE,
   CONTROLS_PAGE,
   SETUP_PAGE,
   LIMITS_PAGE,
-  EVENTS_PAGE,
   SYSTEM_PAGE
 };
 
-#define SELECT_MENU_MIN CONTROLS_PAGE
+#define SELECT_MENU_MIN EVENTS_PAGE
 #define SELECT_MENU_MAX SYSTEM_PAGE
 
 extern page_t page;
@@ -50,8 +52,8 @@ extern level_t level;
 
 enum selection_t {
   /* HOME_PAGE */
-  TIDAL_VOLUME,
   RESPIRATORY_RATE,
+  TIDAL_VOLUME,
   PLATEAU_AIRWAY_PRESSURE,
   /* CONTROLS_PAGE */
   RESPIRATORY_RATIO,
@@ -75,7 +77,7 @@ enum selection_t {
 
 extern selection_t selection;
 
-#define HOME_SELECTION_MIN TIDAL_VOLUME
+#define HOME_SELECTION_MIN RESPIRATORY_RATE
 #define HOME_SELECTION_MAX PLATEAU_AIRWAY_PRESSURE
 
 #define CONTROLS_SELECTION_MIN RESPIRATORY_RATIO
@@ -180,11 +182,11 @@ struct live_t {
   unsigned inspiratoryRpm;
   unsigned expiratoryRpm;
   unsigned fullPressSteps;
-  unsigned tidalSteps;
+  unsigned tidalEndPosition;
 
 #ifdef TORQUE_RAMP
-  unsigned _400Steps;
-  unsigned _600Steps;
+  unsigned firstPosition;
+  unsigned secondPosition;
 #endif
 
   byte rpmRamp;
@@ -208,15 +210,16 @@ void ctrl_pressure_trigger(unsigned value);
 void live_volume_per_revolution();
 void live_breath_cycle_time();
 void live_inspiratory_time();
+void live_volume();
 void live_minute_ventilation();
 void actual_minute_ventilation();
 void live_full_press_steps();
 unsigned tidal_steps(unsigned volume);
-inline void live_tital_steps() { live.tidalSteps = tidal_steps(ctrl.tidalVolume); }
+void live_tital_end_position();
 
 #ifdef TORQUE_RAMP
-inline void live_400_steps() { live._400Steps = ctrl.startPosition + tidal_steps(400); }
-inline void live_600_steps() { live._600Steps = ctrl.startPosition + tidal_steps(600); }
+void live_first_position();
+void live_second_position();
 #endif
 
 int clamp_input_value(int value, int step, int8_t dir, int lo, int hi);

@@ -10,13 +10,14 @@ Part|Description|Quantity
 ![PEEP Valve](peep-valve.jpg)|[PEEP Valve](https://www.laerdal.com/au/item/845240) (5-20 cm H2O).|1
 ![HEPA Filter](filter.jpg)|HEPA Filter.|1
 ![Extension Tube](extension-tube.jpg)|[Silicone Extension Tube](https://www.laerdal.com/au/item/871000).|1
+![Manometer Connector](manometer-connector.jpg)|[Manometer connector](https://www.laerdal.com/au/item/850900). This barb requires a 6mm oxygen hose.|Option
 
 ## Hardware
 
 Part|Description|Quantity
 ----|----|----
 ![Silicon Hose](silicon-hose.jpg)|5mm OD x 3mm ID x 250mm L food grade silicon hose.|1
-![Hose Fitting](4mm_1-8_BSP-hose-barb.jpg)|1/8" BSP to 4mm barb hose fitting. This barb protrudes from the back of the housing base and is used to connect the manifold hose to the pressure sensor.|1
+![Hose Fitting](4mm_1-8_BSP-hose-barb.jpg)|1/8" BSP to 4mm barb hose fitting. This barb protrudes from the back of the housing base and is used to connect the manifold hose to the pressure sensor. If you decide to use the optional [manometer connector](https://www.laerdal.com/au/item/850900) a 1/8" BSP to **6mm** barb hose fitting should be used.|1
 ![Bearing](608-2RS-bearing.jpg)|608-2RS 22mm OD x 8mm ID x 7mm W skate bearings.|11
 ![M3x6mm Machine Screws](M3x6mm-socket-cap.jpg)|M3 x 6mm stainless socket head cap screws are used to attach the stepper motor to the ring mount, and the Arduino Uno, stepper driver and endstop circuit boards to the base.|13
 ![M3x12mm Machine Screws](M3x12mm-socket-cap.jpg)|M3 x 12mm stainless socket head cap screws are used to attach the interface front cover to the interface panel.|4

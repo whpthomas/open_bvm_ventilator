@@ -64,8 +64,8 @@ void ctrl_start_position(unsigned value) {
   //DebugMessage("ctrl.startPosition = ", ctrl.startPosition);
   live_full_press_steps();
 #ifdef TORQUE_RAMP
-  live_400_steps();
-  live_600_steps();
+  live_first_position();
+  live_second_position();
 #endif
 }
 
@@ -77,11 +77,11 @@ void ctrl_start_position(unsigned value) {
 void ctrl_full_press_volume(unsigned value) {
   ctrl.fullPressVolume = value;
   //DebugMessage("ctrl.fullPressVolume = ", ctrl.fullPressVolume);
-  live_tital_steps();
+  live_tital_end_position();
   live_volume_per_revolution();
 #ifdef TORQUE_RAMP
-  live_400_steps();
-  live_600_steps();
+  live_first_position();
+  live_second_position();
 #endif
 }
 
@@ -92,7 +92,7 @@ void ctrl_full_press_volume(unsigned value) {
 void ctrl_tidal_volume(unsigned value) {
   ctrl.tidalVolume = value;
   //DebugMessage("ctrl.tidalVolume = ", ctrl.tidalVolume);
-  live_tital_steps();
+  live_tital_end_position();
   live_minute_ventilation();
 }
 
@@ -194,6 +194,13 @@ void live_inspiratory_time() {
   //DebugMessage("live.inspiratoryTime = ", live.inspiratoryTime);
 }
 
+/* INSPIRATORY TIME
+ * Calculated tidal volume
+ */
+void live_volume() {
+  live.volume = ((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps;
+}
+
 /* MINUTE VENTILATION
  * Volume of air per minute
  */
@@ -203,13 +210,6 @@ void live_minute_ventilation() {
   //DebugMessage("live.minuteVentilation = ", live.minuteVentilation);
 }
 
-/*
-void actual_minute_ventilation() {
-  live.minuteVentilation = 60.0 * ctrl.actualVolume / ctrl.actualCycleTime;
-  //DebugMessage("live.minuteVentilation = ", live.minuteVentilation);
-}
-*/
-
 /* TIDAL STEPS
  * Number of steps in a breath
  */
@@ -218,6 +218,22 @@ unsigned tidal_steps(unsigned volume) {
   return ((unsigned long)live.fullPressSteps * volume) / ctrl.fullPressVolume;
 }
 
+void live_tital_end_position() { 
+  live.tidalEndPosition = ctrl.startPosition + tidal_steps(ctrl.tidalVolume); 
+  DebugMessage("live.tidalEndPosition = ", live.tidalEndPosition);
+}
+
+#ifdef TORQUE_RAMP
+void live_first_position() { 
+  live.firstPosition = ctrl.startPosition + tidal_steps(FIRST_POSITION_VOLUME);
+}
+
+void live_second_position() { 
+  live.secondPosition = ctrl.startPosition + tidal_steps(SECOND_POSITION_VOLUME);
+}
+#endif
+
+
 /* PRESS STEPS
  * Number of steps in a full press 
  */
@@ -225,11 +241,13 @@ unsigned tidal_steps(unsigned volume) {
 void live_full_press_steps() {
   live.fullPressSteps = END_POSITION - ctrl.startPosition;
   //DebugMessage("live.fullPressSteps = ", live.fullPressSteps);
-  live_tital_steps();
+  //DebugMessage("STEPS_PER_ROTATION = ", STEPS_PER_ROTATION); // 45454
+  //DebugMessage("END_POSITION = ", END_POSITION); // 12626
+  live_tital_end_position();
   live_volume_per_revolution();
 #ifdef TORQUE_RAMP
-  live_400_steps();
-  live_600_steps();
+  live_first_position();
+  live_second_position();
 #endif
 }
 
@@ -262,23 +280,23 @@ void alarm_event(alarm_t a)
 
 void factory_reset()
 {
-  ctrl.startPosition = 500;
-  ctrl.fullPressVolume = 850;
-  ctrl.tidalVolume = 450;
-  ctrl.respiratoryRate = 12;
-  ctrl.respiratoryRatio = 3;
-  ctrl.plateauAirwayPressure = 300;
-  ctrl.inspiratoryFlow = 35;
-  ctrl.expiratoryFlow = 35;
-  ctrl.triggerPressure = 50;
+  ctrl.startPosition = DEFAULT_START_POSITION;
+  ctrl.fullPressVolume = DEFAULT_FULL_PRESS_VOLUME;
+  ctrl.tidalVolume = DEFAULT_TIDAL_VOLUME;
+  ctrl.respiratoryRate = DEFAULT_RESPIRATORY_RATE;
+  ctrl.respiratoryRatio = DEFAULT_RESPIRATORY_RATIO;
+  ctrl.plateauAirwayPressure = DEFAULT_PLATEAU_AIRWAY_PRESSURE;
+  ctrl.inspiratoryFlow = DEFAULT_INSPIRATORY_FLOW;
+  ctrl.expiratoryFlow = DEFAULT_EXPIRATORY_FLOW;
+  ctrl.triggerPressure = DEFAULT_TRIGGER_PRESSURE;
   ctrl.ventilationActive = false;
 
-  limit.minimum.pressure = 50;
-  limit.maximum.pressure = 400;
-  limit.minimum.ventilation = 3000;
-  limit.maximum.ventilation = 8000;
-  limit.minimum.volume = 180;
-  limit.maximum.volume = 750;
+  limit.minimum.pressure = DEFAULT_MINIMUM_PRESSURE;
+  limit.maximum.pressure = DEFAULT_MAXIMUM_PRESSURE;
+  limit.minimum.ventilation = DEFAULT_MINIMUM_MINUTE_VENTILATION;
+  limit.maximum.ventilation = DEFAULT_MAXIMUM_MINUTE_VENTILATION;
+  limit.minimum.volume = DEFAULT_MINIMUM_VOLUME;
+  limit.maximum.volume = DEFAULT_MAXIMUM_VOLUME;
 
   live_full_press_steps();
   live_breath_cycle_time();

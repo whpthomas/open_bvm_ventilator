@@ -1,4 +1,4 @@
-//  Open BVM Ventilator
+//  Open BVM Ventilator - firmware
 //
 //  Created by WHPThomas <me(at)henri(dot)net> on 20/02/20.
 //  Copyright (c) 2020 WHPThomas
@@ -50,11 +50,11 @@ BME280I2C bme(settings);
 
 void select_home_page();
 int read_pressure();
-void update_pressure();
+void graph_pressure();
 void check_pressure();
 
 void setup() {
-  IF_DEBUG( debug.begin(115200); )
+  IF_DEBUG( debug.begin(9600); )
   stepper_setup();
   timer1_setup();
   ctrl_setup();
@@ -74,6 +74,8 @@ void setup() {
   fastPinMode(STOP_BUTTON_PIN, INPUT_PULLUP);
   fastPinMode(HOME_ENDSTOP_PIN, INPUT_PULLUP);
   phase = HOME_PHASE;
+
+  if(ctrl.ventilationActive) alarm_event(POWER_FAILURE_ALARM);
 }
 
 void loop()
@@ -83,6 +85,7 @@ void loop()
   static unsigned long inspiratoryTimer;
   static unsigned long breathCycleTimer;
   static unsigned long lastBreathCycle;
+  static bool makeSound = false;
   
   /* ROTARY ENCODER BEHAVIOR
    * If value level, change the selection input value within range
@@ -95,28 +98,28 @@ void loop()
       default: // encoder changes control value 
         switch(selection) {
           /* HOME_PAGE */
-          case TIDAL_VOLUME:
-            ctrl_tidal_volume(clamp_input_value(ctrl.tidalVolume, 5, encoder.dir, limit.minimum.volume, limit.maximum.volume));
-            break;
           case RESPIRATORY_RATE:
-            ctrl_respiratory_rate(clamp_input_value(ctrl.respiratoryRate, 1, encoder.dir, 12, 20));
+            ctrl_respiratory_rate(clamp_input_value(ctrl.respiratoryRate, 1, encoder.dir, MINIMUM_RESPIRATORY_RATE, MAXIMUM_RESPIRATORY_RATE));
+            break;
+          case TIDAL_VOLUME:
+            ctrl_tidal_volume(clamp_input_value(ctrl.tidalVolume, VOLUME_INCREMENT, encoder.dir, limit.minimum.volume, limit.maximum.volume < ctrl.fullPressVolume ? limit.maximum.volume : ctrl.fullPressVolume));
             break;
           case PLATEAU_AIRWAY_PRESSURE:
-            ctrl_plateau_airway_pressure(clamp_input_value(ctrl.plateauAirwayPressure, 10, encoder.dir, limit.minimum.pressure, limit.maximum.pressure));
+            ctrl_plateau_airway_pressure(clamp_input_value(ctrl.plateauAirwayPressure, PLATEAU_AIRWAY_PRESSURE_INCREMENT, encoder.dir, limit.minimum.pressure, limit.maximum.pressure));
             break;
 
           /* CONTROLS_PAGE */
           case RESPIRATORY_RATIO:
-            ctrl_respiratory_ratio(clamp_input_value(ctrl.respiratoryRatio, 1, encoder.dir, 1, 5));
+            ctrl_respiratory_ratio(clamp_input_value(ctrl.respiratoryRatio, 1, encoder.dir, MINIMUM_RESPIRATORY_RATIO, MAXIMUM_RESPIRATORY_RATIO));
             break;
           case TRIGGER_PRESSURE:
-            ctrl_pressure_trigger(clamp_input_value(ctrl.triggerPressure, 1, encoder.dir, 0, 50));
+            ctrl_pressure_trigger(clamp_input_value(ctrl.triggerPressure, 1, encoder.dir, MINIMUM_TRIGGER_PRESSURE, MAXIMUM_TRIGGER_PRESSURE));
             break;
           case INSPIRATORY_FLOW:
-            ctrl_inspiratory_flow(clamp_input_value(ctrl.inspiratoryFlow, 1, encoder.dir, 10, 60));
+            ctrl_inspiratory_flow(clamp_input_value(ctrl.inspiratoryFlow, 1, encoder.dir, MINIMUM_INSPIRATORY_FLOW, MAXIMUM_INSPIRATORY_FLOW));
             break;
           case EXPIRATORY_FLOW:
-            ctrl_expiratory_flow(clamp_input_value(ctrl.expiratoryFlow, 1, encoder.dir, 10, 60));
+            ctrl_expiratory_flow(clamp_input_value(ctrl.expiratoryFlow, 1, encoder.dir, MINIMUM_EXPIRATORY_FLOW, MAXIMUM_EXPIRATORY_FLOW));
             break;
 
           /* SETUP PAGE */
@@ -128,26 +131,26 @@ void loop()
           /* LIMITS_PAGE */
           case PRESSURE_LIMIT:
             if(level == OTHER_VALUE_LEVEL) {
-              limit_minimum_pressure(clamp_input_value(limit.minimum.pressure, 1, encoder.dir, 0, 200));
+              limit_minimum_pressure(clamp_input_value(limit.minimum.pressure, 1, encoder.dir, MINIMUM_PRESSURE, MAXIMUM_MINIMUM_PRESSURE));
             }
             else {
-              limit_maximum_pressure(clamp_input_value(limit.maximum.pressure, 1, encoder.dir, 50, 600));              
+              limit_maximum_pressure(clamp_input_value(limit.maximum.pressure, 1, encoder.dir, MINIMUM_MAXIMUM_PRESSURE, MAXIMUM_PRESSURE));              
             }
             break;
           case MINUTE_VENTILATION_LIMIT:
             if(level == OTHER_VALUE_LEVEL) {
-              limit_minimum_ventilation(clamp_input_value(limit.minimum.ventilation, 100, encoder.dir, 3000, 10000));
+              limit_minimum_ventilation(clamp_input_value(limit.minimum.ventilation, MINUTE_VENTILATION_INCREMENT, encoder.dir, MINIMUM_MINUTE_VENTILATION, MAXIMUM_MINIMUM_MINUTE_VENTILATION));
             }
             else {
-              limit_maximum_ventilation(clamp_input_value(limit.maximum.ventilation, 100, encoder.dir, 3000, 10000));              
+              limit_maximum_ventilation(clamp_input_value(limit.maximum.ventilation, MINUTE_VENTILATION_INCREMENT, encoder.dir, MINIMUM_MAXIMUM_MINUTE_VENTILATION, MAXIMUM_MINUTE_VENTILATION));              
             }
             break;
           case TIDAL_VOLUME_LIMIT:
             if(level == OTHER_VALUE_LEVEL) {
-              limit_minimum_volume(clamp_input_value(limit.minimum.volume, 5, encoder.dir, 180, ctrl.fullPressVolume));
+              limit_minimum_volume(clamp_input_value(limit.minimum.volume, VOLUME_INCREMENT, encoder.dir, MINIMUM_VOLUME, ctrl.fullPressVolume));
             }
             else {
-              limit_maximum_volume(clamp_input_value(limit.maximum.volume, 5, encoder.dir, 180, ctrl.fullPressVolume));              
+              limit_maximum_volume(clamp_input_value(limit.maximum.volume, VOLUME_INCREMENT, encoder.dir, MINIMUM_MAXIMUM_VOLUME, ctrl.fullPressVolume));              
             }
             break;
 
@@ -155,13 +158,15 @@ void loop()
           case AUDIBLE_ALARM:
             break;
           case START_POSITION:
-            ctrl_start_position(clamp_input_value(ctrl.startPosition, 50, encoder.dir, 500, 2000));
+            ctrl_start_position(clamp_input_value(ctrl.startPosition, START_POSITION_INCREMENT, encoder.dir, MINIMUM_START_POSITION, MAXIMUM_START_POSITION));
             if(phase == NO_PHASE) {
+              enable_stepper();
               move_to_position(ctrl.startPosition, live.expiratoryRpm, true);
+              disable_stepper();
             }
             break;
           case FULL_PRESS_VOLUME:
-            ctrl_full_press_volume(clamp_input_value(ctrl.fullPressVolume, 10, encoder.dir, 400, 1000));
+            ctrl_full_press_volume(clamp_input_value(ctrl.fullPressVolume, FULL_PRESS_VOLUME_INCREMENT, encoder.dir, MINIMUM_FULL_PRESS_VOLUME, MAXIMUM_FULL_PRESS_VOLUME));
             break;
           case FACTORY_RESET:
             break;
@@ -178,6 +183,8 @@ void loop()
           case SELECT_PAGE:
             menu = clamp_input_value(menu, 1, encoder.dir, SELECT_MENU_MIN, SELECT_MENU_MAX);
             break;
+          case EVENTS_PAGE:
+            break;
           case CONTROLS_PAGE:
             selection = (selection_t)clamp_input_value(selection, 1, encoder.dir, CONTROLS_SELECTION_MIN, CONTROLS_SELECTION_MAX);
             break;
@@ -186,8 +193,6 @@ void loop()
             break;
           case LIMITS_PAGE:
             selection = (selection_t)clamp_input_value(selection, 1, encoder.dir, LIMITS_SELECTION_MIN, LIMITS_SELECTION_MAX);
-            break;
-          case EVENTS_PAGE:
             break;
           case SYSTEM_PAGE:
             selection = (selection_t)clamp_input_value(selection, 1, encoder.dir, SYSTEM_SELECTION_MIN, SYSTEM_SELECTION_MAX);
@@ -233,6 +238,11 @@ void loop()
             break;
         }
         break;
+      case EVENTS_PAGE:
+        events.length = 0;
+        green_led();
+        select_home_page();
+        break;
       case LIMITS_PAGE: // rotary button toggles minimum and maximum limits
         switch(level) {
           case OTHER_VALUE_LEVEL:
@@ -254,24 +264,22 @@ void loop()
         else if(!ctrl.ventilationActive && selection == PRESSURE_TEST) {
           live.rpmRamp = 0;
           live.peakPressure = 0;
-          move_to_position(ctrl.startPosition + live.tidalSteps, live.inspiratoryRpm, false);
+          enable_stepper();
+          move_to_position(live.tidalEndPosition, live.inspiratoryRpm, false);
           while(!stp.done) {
             live.pressure = read_pressure();
             check_pressure();
             if(redrawTimer < now) {
-              redrawTimer = now + 200; 
-              update_pressure();
+              redrawTimer = now + 200;
+              graph_pressure();
             }
             if(redraw) {
               draw_update();
             }
           }
+          DebugMessage("stp.p = ", stp.p);  
           move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
         }
-        break;
-      case EVENTS_PAGE:
-        events.length = 0;
-        select_home_page();
         break;
       case SYSTEM_PAGE:
         if(selection == AUDIBLE_ALARM) {
@@ -317,11 +325,10 @@ void loop()
      //IF_DEBUG( debug.println("stop button"); )
     if(alarm) { // stop button disables alarm
       alarm = NO_ALARM;
-      page = EVENTS_PAGE;
-      menu = SELECT_MENU_MIN;
     }
-    else if(phase < NO_PHASE) {
+    if(phase < NO_PHASE) {
       emergency_stop();
+      disable_stepper();
       phase = NO_PHASE;
     }
     else {
@@ -348,15 +355,23 @@ void loop()
 
   homeEndstop.update(fastDigitalRead(HOME_ENDSTOP_PIN) ? 0 : 1); 
   if(homeEndstop.pressed()) {
-     //IF_DEBUG( debug.println("home endstop"); )
+    //IF_DEBUG( debug.println("home endstop"); )
     switch(phase) {
       case HOME_PHASE:
-        move_to_position(ctrl.startPosition, live.expiratoryRpm, true);
         blue_led();
+        phase = ZERO_PHASE;
+        enable_stepper();
+        home_stop();
+        live.zeroPressure = read_pressure();
+        move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
         break;
       case ENDSTOP_PHASE:
-        phase = ZERO_PHASE;
         green_led();
+        phase = ZERO_PHASE;
+        enable_stepper();
+        home_stop();
+        live.zeroPressure = read_pressure();
+        move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
         break;
       case ZERO_PHASE:
         break;
@@ -364,16 +379,13 @@ void loop()
         phase = HOME_PHASE;
         break;
     }
-    home_stop();
-    move_to_position(ctrl.startPosition, live.expiratoryRpm, true);
     redraw = true;
   }
 
   live.pressure = read_pressure();
   if(redrawTimer < now) {
     redrawTimer = now + 200;
-    update_pressure();
-    redraw = true;
+    graph_pressure();
   }
 
   /* RESPIRATION CYCLE
@@ -382,22 +394,18 @@ void loop()
 
   switch(phase) {
     case HOME_PHASE:
-       //IF_DEBUG( debug.println("Homing"); )
-      move_to_position(-((int)END_POSITION), live.expiratoryRpm, false); // home stepper motor until endstop
+      //IF_DEBUG( debug.println("Homing"); )
+      enable_stepper();
+      move_to_position(-STEPS_PER_ROTATION, 200); // home stepper motor until endstop
       phase = ENDSTOP_PHASE;
       redraw = true;
       break;
  
-    case ENDSTOP_PHASE:
-      if(stp.done) {
-        phase = NO_PHASE;
-        redraw = true;
-      }
-      break;
- 
+    case ENDSTOP_PHASE: 
     case ZERO_PHASE:
       if(stp.done) {
-        live.zeroPressure = read_pressure();
+        //IF_DEBUG( debug.println("Zero"); )
+        disable_stepper();
         phase = NO_PHASE;
         redraw = true;
       }
@@ -405,6 +413,7 @@ void loop()
 
     case NO_PHASE:
       if(!ctrl.ventilationActive) break;
+      enable_stepper();
       lastBreathCycle = now - live.breathCycleTime;
       green_led();
       redraw = true;
@@ -414,8 +423,13 @@ void loop()
       if(stp.done) {
         live.rpmRamp = 0;
         if(!alarm) green_led();
+        if(makeSound) {
+           tone(BEEPER_PIN, 8000, 500);
+           makeSound = false;
+        }
         if(live.zeroPressure - live.pressure >= ctrl.triggerPressure || breathCycleTimer < now) {  // if negative trigger pressure or timed breath
           if(!ctrl.ventilationActive) { // check ventilation still active
+            disable_stepper();
             phase = NO_PHASE;
             redraw = true;
             break;
@@ -432,8 +446,8 @@ void loop()
 
     case INSPIRATORY_PHASE:
       if(!alarm) blue_led();
-      if(alarm && live.audibleAlarm) tone(BEEPER_PIN, 8000, 500);
-      move_to_position(ctrl.startPosition + live.tidalSteps, live.inspiratoryRpm, false);
+      else if(live.audibleAlarm) makeSound = true;
+      move_to_position(live.tidalEndPosition, live.inspiratoryRpm, false);
       phase = CYCLING_PHASE;
       live.peakPressure = 0;
       redraw = true;
@@ -448,8 +462,8 @@ void loop()
           live.volume = ((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps;
           phase = EXPIRATORY_PHASE;
           redraw = true;
-          int Ip = live.pressure - live.zeroPressure;
-          if(Ip >= 0 && Ip < limit.minimum.pressure) {
+          int ip = live.pressure - live.zeroPressure;
+          if(ip >= 0 && ip < limit.minimum.pressure) {
             alarm_event(UNDER_PRESSURE_ALARM);
           }
         }
@@ -465,7 +479,6 @@ void loop()
   
   if(live.peakPressure > limit.maximum.pressure) {
     alarm_event(OVER_PRESSURE_ALARM);
-    live.peakPressure = 0;
   }
 
   if(live.volume < limit.minimum.volume) {
@@ -508,21 +521,6 @@ int read_pressure()
   return round(pres);
 }
 
-void update_pressure()
-{
-  unsigned v = (((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps) / 48;
-  if(v > 10) v = 10;
-  graph.volume[graph.index & GRAPH_MASK] = v;
-  
-  int p = (live.pressure - live.zeroPressure) / 2;
-  if(p > 27) p = 27;
-  if(p < -5) p = -5;
-  graph.pressure[graph.index & GRAPH_MASK] = p;
-  //DebugMessage("pressure = ", p);
-  redraw = true;
-  graph.index++;
-}
-
 #define RAMP_MAX 3
 
 void check_pressure()
@@ -530,25 +528,42 @@ void check_pressure()
   int pressure = live.pressure - live.zeroPressure;
   if(live.peakPressure < pressure) live.peakPressure = pressure;
   if(live.rpmRamp < RAMP_MAX && pressure >= ctrl.plateauAirwayPressure) { // if plateau airway pressure reached
-    update_rpm(0, false); // ramp down stepper motor
+    //DebugMessage("live.peakPressure = ", live.peakPressure);  
+    //DebugMessage("microseconds = ", stp.ms);
+    update_rpm(0); // ramp down stepper motor  
     live.rpmRamp = RAMP_MAX;
   }
 #ifdef TORQUE_RAMP
   else {
     switch(live.rpmRamp) {
       case 0:
-        if(pressure > 10 || stp.p > live._400Steps) {
-          update_rpm(live.inspiratoryRpm / 2, false);
+        if(pressure > FIRST_POSITION_PRESSURE || stp.p > live.firstPosition) {
+          update_rpm(live.inspiratoryRpm * 2 / 3);
           live.rpmRamp++;
         }
         break;
       case 1:
-        if(pressure > 20 || stp.p > live._600Steps) {
-          update_rpm(live.inspiratoryRpm / 3, false);
+        if(pressure > SECOND_POSITION_PRESSURE || stp.p > live.secondPosition) {
+          update_rpm(live.inspiratoryRpm / 2);
           live.rpmRamp++;
         }
         break;
     }
   }
 #endif
+}
+
+void graph_pressure()
+{
+  unsigned v = (((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps) / 48;
+  if(v > 10) v = 10;
+  graph.volume[graph.index & GRAPH_MASK] = v;
+  
+  int p = (live.pressure - live.zeroPressure) / 4;
+  if(p > 27) p = 27;
+  if(p < -5) p = -5;
+  graph.pressure[graph.index & GRAPH_MASK] = p;
+  //DebugMessage("pressure = ", p);
+  redraw = true;
+  graph.index++;
 }

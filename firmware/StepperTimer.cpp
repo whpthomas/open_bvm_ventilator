@@ -37,7 +37,6 @@ void timer1_setup()
 ISR(TIMER1_COMPA_vect)
 {
   fastDigitalWrite(STEP_PIN, HIGH);
-  fastDigitalWrite(STEP_PIN, LOW);
 
   stp.c++;
   stp.p += stp.i;
@@ -50,7 +49,7 @@ ISR(TIMER1_COMPA_vect)
       stp.atTargetRpm = true; // target speed reached
       stp.done = true;
       timer1_stop();  // stop timer
-      return;
+      goto L_RETURN;
     }
     else if(stp.d != stp.td) { // instant start
       stp.n = 1;      // set ramp count 
@@ -76,14 +75,11 @@ ISR(TIMER1_COMPA_vect)
   }
   set_timer1(stp.d);
   
-  if(stp.n == 0) {  // if ramp count zero
-    stp.atTargetRpm = true; // target speed reached
-    stp.done = true;
-    timer1_stop();  // stop timer
-  }
-  else if(stp.ms && stp.c >= stp.tc - stp.n) { // ramp down step count
+  if(stp.ms && stp.c >= stp.tc - stp.n) { // ramp down step count
     stp.ms = 0; // signal ramp down
     stp.td = stp.c0; // target delay is c0
     stp.atTargetRpm = false;
   }
+L_RETURN:
+  fastDigitalWrite(STEP_PIN, LOW);
 }

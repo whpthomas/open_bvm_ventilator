@@ -21,13 +21,13 @@
 
 #pragma once
 
-#define INVERT_STEP_DIRECTION
+//#define INVERT_STEP_DIRECTION
 
 const float STEP_ANGLE = 1.8;
 const float MICRO_STEPS = 8;
 const float STEPS_PER_REVOLUTION = (360.0 / STEP_ANGLE * MICRO_STEPS);
 
-#define DEFAULT_ACCEL 300
+#define DEFAULT_ACCEL 400
 #define MIN_DELAY 100
 #define MAX_RPM 400
 
@@ -58,13 +58,13 @@ void disable_stepper();
 
 void set_acceleration(unsigned long accel);
 
-void set_rpm(float rpm, bool wait = true);
-inline void update_rpm(float rpm, bool wait) { if(stp.ms) set_rpm(rpm, wait); }
+void set_rpm(float rpm, bool wait = false);
+inline void update_rpm(float rpm, bool wait = false) { if(stp.ms) set_rpm(rpm, wait); }
 
 void set_speed(float r, unsigned d = 1000);
 
 void home_stop();
 void emergency_stop();
 
-void move_n_steps(long steps, float rpm, bool wait = true);
-void move_to_position(long p, float rpm, bool wait = true);
+void move_n_steps(long steps, float rpm, bool wait = false);
+void move_to_position(long p, float rpm, bool wait = false);

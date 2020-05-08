@@ -59,6 +59,9 @@ void draw_update()
     case SELECT_PAGE:
       draw_select_page();
       break;
+    case EVENTS_PAGE:
+      draw_events_page();
+      break;
     case CONTROLS_PAGE:
       draw_controls_page();
       break;
@@ -67,9 +70,6 @@ void draw_update()
       break;
     case LIMITS_PAGE:
       draw_limits_page();
-      break;
-    case EVENTS_PAGE:
-      draw_events_page();
       break;
     case SYSTEM_PAGE:
       draw_system_page();
@@ -224,22 +224,22 @@ void draw_graph(byte offset, int8_t *data)
   }
 }
 
-void draw_peak_pressure()
+void draw_pressure()
 {
-  draw_value(0, 50, F("Pip"), (live.peakPressure - 5) / 10, F("cm"), false);   
-}
-
-void draw_home_page()
-{
-  draw_value(0, 0, F("Vt"), ctrl.tidalVolume, F("ml"), selection == TIDAL_VOLUME);
-  draw_k_value(64, 0, F("Mv"), live.minuteVentilation, F("l/m"), false);  
-  draw_value(0, 25, F("Rr"), ctrl.respiratoryRate, F("bpm"), selection == RESPIRATORY_RATE);
   if(live.peakPressure && selection != PLATEAU_AIRWAY_PRESSURE) {
-    draw_peak_pressure();
+    draw_value(0, 50, F("Pip"), (live.peakPressure + 5) / 10, F("cm"), false);  
   }
   else {
     draw_value(0, 50, F("Paw"), ctrl.plateauAirwayPressure / 10, F("cm"), selection == PLATEAU_AIRWAY_PRESSURE);
   }
+}
+
+void draw_home_page()
+{
+  draw_value(0, 0, F("Rr"), ctrl.respiratoryRate, F("bpm"), selection == RESPIRATORY_RATE);
+  draw_k_value(64, 0, F("Mv"), live.minuteVentilation, F("l/m"), false);  
+  draw_value(0, 25, F("Vt"), ctrl.tidalVolume, F("ml"), selection == TIDAL_VOLUME);
+  draw_pressure();
   draw_alert();
   draw_graph(42, graph.volume);
   draw_graph(59, graph.pressure);
@@ -261,10 +261,10 @@ void draw_item(byte column, byte row, const __FlashStringHelper *item, bool sele
 void draw_select_page()
 {
   draw_message(0, 0, F("Select page"));
-  draw_item(20, 2, F("Controls"), menu == CONTROLS_PAGE);
-  draw_item(20, 3, F("Setup"), menu == SETUP_PAGE);
-  draw_item(20, 4, F("Limits"), menu == LIMITS_PAGE);
-  draw_item(20, 5, F("Events"), menu == EVENTS_PAGE);
+  draw_item(20, 2, F("Events"), menu == EVENTS_PAGE);
+  draw_item(20, 3, F("Controls"), menu == CONTROLS_PAGE);
+  draw_item(20, 4, F("Setup"), menu == SETUP_PAGE);
+  draw_item(20, 5, F("Limits"), menu == LIMITS_PAGE);
   draw_item(20, 6, F("System"), menu == SYSTEM_PAGE);
 }
 
@@ -319,11 +319,11 @@ void draw_controls_page()
 
 void draw_setup_page()
 {
-  draw_message(0, 0, F("Controls Page"));
+  draw_message(0, 0, F("Setup Page"));
   draw_item(10, 1, ctrl.ventilationActive ? F("Stop Ventilation") : F("Start Ventilation"), selection == START_STOP_VENTILATION);
   if(!ctrl.ventilationActive) {
     draw_item(10, 2, F("Pressure Test"), selection == PRESSURE_TEST); 
-    draw_peak_pressure();
+    draw_pressure();
     draw_graph(59, graph.pressure);
   }
 }

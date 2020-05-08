@@ -4,6 +4,9 @@
 
 This is a reference design and test platform for open source non-invasive bag valve mask ventilators. It features 3D printable parts and uses common off-the-shelf hardware and components.
 
+3D Printable files can be found here and on [Thingiverse](https://www.thingiverse.com/thing:4335859).
+Fusion 360 CAD files can be found here and on GrabCAD.
+
 ## Specification
 
 The Open BVM Ventilator is non-invasive and operates in universal mode (spontaneous pressure triggered ventilation with pressure-limited mandatory ventilation). It has been designed to meet all the applicable requirements outlined in the [Ventilator for COVID-19 use in Australia](spec/ventilator-covid-19-use-australia.pdf) document published on the [Australian Government, Department of Health, Therapeutic Goods Administration](https://www.tga.gov.au/ventilator-covid-19-use-australia) website.
@@ -47,8 +50,8 @@ These capabilities have been verified with static tests using a manometer but wi
 ### Outstanding Issues
 
 1. The actual tidal volume is currently estimated and needs calibration - this will be resolved shortly.
-2. Maximum inspiratory and expiratory flow is limited to 35 l/min by the maximum stepper motor RPM and torque. This may or may not be adequate for clinical use and therefore may require selection of a different stepper motor and driver combination to achieve the 100 l/min capability specified.
-3. The current stepper driver is noisy and will to be replaced with a TMC2209. However this would require an active cooling fan.
+2. Maximum inspiratory and expiratory flow is limited to 35 l/min by the maximum stepper motor RPM and torque. I will attempt to resolve this by using a TMC2209 driver and by adding a DC Step Up to 24v for the Stepper motor power supply.
+3. The current stepper driver is noisy and will to be replaced with a TMC2209 driver. However this will require the addition of a cooling fan.
 
 ## Hardware
 
@@ -138,4 +141,4 @@ S6|ON|50% Delay
 
 # TERMS OF USE
 
-Open BVM Ventilator reference designs are intended for educational purposes, ARE NOT CERTIFIED FOR MEDICAL USE, ARE PROVIDED "AS IS" AND "WITH ALL FAULTS. Dr. Henry Thomas DISCLAIMS ALL OTHER WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Dr. Henry Thomas may make changes to reference design specifications and descriptions at any time, without notice.
+Open BVM Ventilator reference designs are intended for educational purposes, ARE NOT CERTIFIED FOR MEDICAL USE, ARE PROVIDED "AS IS" AND "WITH ALL FAULTS". Dr. Henry Thomas DISCLAIMS ALL OTHER WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Dr. Henry Thomas may make changes to reference design specifications and descriptions at any time, without notice.

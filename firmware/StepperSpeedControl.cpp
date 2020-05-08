@@ -36,6 +36,7 @@ void stepper_setup()
 
   memset(&stp, 0, sizeof(stp_t));
   set_acceleration(DEFAULT_ACCEL);
+  stp.i = 1;
 }
 
 void enable_stepper()
@@ -58,9 +59,11 @@ static void set_delay(long microseconds) {
   // check 
   if(microseconds > 0) {
     if(microseconds < MIN_DELAY) microseconds = MIN_DELAY;
+    stp.i = 1;
   }
   else if(microseconds < 0) {
     if(microseconds > -MIN_DELAY) microseconds = -MIN_DELAY;
+    stp.i = -1;
   }
 
   if(stp.ms != microseconds) {
@@ -153,7 +156,6 @@ void move_n_steps(long steps, float rpm, bool wait)
 {
   if(steps) {
     if(rpm > MAX_RPM) rpm = MAX_RPM;
-    stp.i = steps > 0 ? 1 : -1;
     stp.c = 0;
     stp.tc = abs(steps);
     stp.done = false;
@@ -164,7 +166,7 @@ void move_n_steps(long steps, float rpm, bool wait)
 
 void set_speed(float r, unsigned d)
 {
-  set_rpm(r); 
+  set_rpm(r, true); 
   delay(d);
 }
 
