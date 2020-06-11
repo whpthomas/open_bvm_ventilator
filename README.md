@@ -39,19 +39,20 @@ The current Open BVM Ventilator design has the following capabilities:
 * Airway pressure safety is set via the maximum pressure limit (Limits page / Pressure / Maximum).
 * Pressurised air is not required, therefore the unit can be operated outside of an ICU using only bottled oxygen and a power supply.
 * All ventilator controls are accessed via the LCD display, stop button and encoder on the [Reprap Discount Full Graphic Smart Controller](https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller).
+* Tidal Volume has been calibrated and verified.
 * Both visual and audible alarms are generated and logged on the Events page.
 * 12v power can be provided via an AC adapter or external battery.
 * All parts can be 3D printed with food safe PLA plastic.
 
-These capabilities have been verified with static tests using a manometer but will require more comprehensive dynamic testing to be considered validated. These dynamic tests are underway, however they require at least 14 days to complete.
+These capabilities have been verified with static tests using a manometer but will require more comprehensive dynamic testing to be considered validated. Some dynamic testing using a water column to simulate pressure and volume has also been undertaken.
 
 ![Open BVM Ventilator Drive](images/drive.jpg)
 
 ### Outstanding Issues
 
-1. The actual tidal volume is currently estimated and needs calibration - this will be resolved shortly.
-2. Maximum inspiratory and expiratory flow is limited to 35 l/min by the maximum stepper motor RPM and torque. I will attempt to resolve this by using a TMC2209 driver and by adding a DC Step Up to 24v for the Stepper motor power supply.
-3. The current stepper driver is noisy and will to be replaced with a TMC2209 driver. However this will require the addition of a cooling fan.
+1. Maximum inspiratory and expiratory flow is limited to 35 l/min by the maximum stepper motor RPM and torque. I will attempt to resolve this by using a TMC2209 driver and by adding a DC Step Up to 24v for the Stepper motor power supply.
+2. The current stepper driver is noisy and will to be replaced with a TMC2209 driver. However this will require the addition of a cooling fan.
+3. **Time and resources:** when I started this project a critical lack of ventilators was in the news. Now that we have *flattened the curve* - particularly here in Australia - not so much. I self-funded this project and spent weeks working on it. I need to get back to work and earn a living, so unless others want to pitch in and help, I am not sure how much more I can do on my own.
 
 ## Hardware
 
