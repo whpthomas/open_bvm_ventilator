@@ -44,9 +44,11 @@ void draw_limits_page();
 void draw_events_page();
 void draw_system_page();
 
-void red_led();
-void yellow_led();
-void green_led();
-void cyan_led();
-void blue_led();
-void magenta_led();
+void set_led(bool r, bool g, bool b);
+
+inline void red_led()     { set_led(true, false, false); }
+inline void yellow_led()  { set_led(true, true, false); }
+inline void green_led()   { set_led(false, true, false); }
+inline void cyan_led()    { set_led(false, true, true); }
+inline void blue_led()    { set_led(false, false, true); }
+inline void magenta_led() { set_led(true, false, true); }

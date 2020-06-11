@@ -134,8 +134,6 @@ void draw_alert()
   
   switch(phase) {
     case HOME_PHASE:
-      message = F("Started");
-      break;
     case ENDSTOP_PHASE:
     case ZERO_PHASE:
       message = F("Homing");
@@ -175,28 +173,30 @@ void draw_alert()
       u8g2.print(message);
       return;
     case UNDER_PRESSURE_ALARM:
+    case UNDER_VENTILATION_ALARM:
+    case UNDER_VOLUME_ALARM:
       dir = F("Under");
+      break;
+    case OVER_PRESSURE_ALARM:
+    case OVER_VENTILATION_ALARM:
+    case OVER_VOLUME_ALARM:
+      dir = F("Over");
+      break;
+  }
+  switch(alarm) {
+    case UNDER_PRESSURE_ALARM:
+    case OVER_PRESSURE_ALARM:
       key = F("Ip");
       break;
     case UNDER_VENTILATION_ALARM:
-      dir = F("Under");
+    case OVER_VENTILATION_ALARM:
       key = F("Mv");
       break;
     case UNDER_VOLUME_ALARM:
-      dir = F("Under");
-      key = F("Vt");
-      break;
-    case OVER_PRESSURE_ALARM:
-      dir = F("Over");
-      key = F("Ip");
-      break;
-    case OVER_VENTILATION_ALARM:
-      dir = F("Over");
-      key = F("Mv");
-      break;
     case OVER_VOLUME_ALARM:
-      dir = F("Over");
       key = F("Vt");
+      break;
+    default:
       break;
   }
   u8g2.print(dir);
@@ -206,12 +206,13 @@ void draw_alert()
 
 void draw_graph(byte offset, int8_t *data)
 {
+  const byte xzero = 64;
   int8_t y, p = offset - data[63] - 1;
   byte x, i;
   for(i = 0; i < 64; i++) {
-    x = 64 + (((63 - i) + graph.index + 1) & 63);
+    x = xzero + (((63 - i) + graph.index + 1) & 63);
     y = offset - data[i];
-    if(x == 64) {
+    if(x == xzero) {
       u8g2.drawVLine(x, p, 1);      
     }
     else if(y <= p) {
@@ -238,11 +239,16 @@ void draw_home_page()
 {
   draw_value(0, 0, F("Rr"), ctrl.respiratoryRate, F("bpm"), selection == RESPIRATORY_RATE);
   draw_k_value(64, 0, F("Mv"), live.minuteVentilation, F("l/m"), false);  
-  draw_value(0, 25, F("Vt"), ctrl.tidalVolume, F("ml"), selection == TIDAL_VOLUME);
+  if(ctrl.ventilationActive && selection != TIDAL_VOLUME) {
+    draw_value(0, 25, F("Vt"), live.volume, F("ml"), false);  
+  }
+  else {
+    draw_value(0, 25, F("Vt"), ctrl.tidalVolume, F("ml"), selection == TIDAL_VOLUME);
+  }
   draw_pressure();
   draw_alert();
   draw_graph(42, graph.volume);
-  draw_graph(59, graph.pressure);
+  draw_graph(62, graph.pressure);
 }
 
 void draw_item(byte column, byte row, const __FlashStringHelper *item, bool selected)
@@ -371,32 +377,34 @@ void draw_events_page()
         case NO_ALARM:
           goto L_NO_ALARMS;
         case UNDER_PRESSURE_ALARM:
-          message = F("Under");
-          key = F("Pressure");
-          break;
         case UNDER_VENTILATION_ALARM:
-          message = F("Under");
-          key = F("Ventilation");
-          break;
         case UNDER_VOLUME_ALARM:
           message = F("Under");
-          key = F("Volume");
           break;
         case OVER_PRESSURE_ALARM:
-          message = F("Over");
-          key = F("Pressure");
-          break;
         case OVER_VENTILATION_ALARM:
-          message = F("Over");
-          key = F("Ventilation");
-          break;
         case OVER_VOLUME_ALARM:
           message = F("Over");
-          key = F("Volume");
-          break;        
+          break;
         case POWER_FAILURE_ALARM:
           message = F("Power");
           key = F("Failure");
+          break;        
+      }
+      switch(events.list[i]) {
+        case UNDER_PRESSURE_ALARM:
+        case OVER_PRESSURE_ALARM:
+          key = F("Pressure");
+          break;      
+        case UNDER_VENTILATION_ALARM:
+        case OVER_VENTILATION_ALARM:
+          key = F("Ventilation");
+          break;
+        case UNDER_VOLUME_ALARM:
+        case OVER_VOLUME_ALARM:
+          key = F("Volume");
+          break;
+        default:
           break;        
       }
       draw_message(0, y, message);  
@@ -419,44 +427,9 @@ void draw_system_page()
   draw_item(0, 6, F("Restart"), selection == RESTART);
 }
 
-void red_led()
+void set_led(bool r, bool g, bool b)
 {
-  fastDigitalWrite(RED_PIN, HIGH);
-  fastDigitalWrite(GREEN_PIN, LOW);
-  fastDigitalWrite(BLUE_PIN, LOW); 
-}
-
-void yellow_led()
-{
-  fastDigitalWrite(RED_PIN, HIGH);
-  fastDigitalWrite(GREEN_PIN, HIGH);
-  fastDigitalWrite(BLUE_PIN, LOW); 
-}
-
-void green_led()
-{
-  fastDigitalWrite(RED_PIN, LOW);
-  fastDigitalWrite(GREEN_PIN, HIGH);
-  fastDigitalWrite(BLUE_PIN, LOW); 
-}
-
-void cyan_led()
-{
-  fastDigitalWrite(RED_PIN, LOW);
-  fastDigitalWrite(GREEN_PIN, HIGH);
-  fastDigitalWrite(BLUE_PIN, HIGH); 
-}
-
-void blue_led()
-{
-  fastDigitalWrite(RED_PIN, LOW);
-  fastDigitalWrite(GREEN_PIN, LOW);
-  fastDigitalWrite(BLUE_PIN, HIGH); 
-}
-
-void magenta_led()
-{
-  fastDigitalWrite(RED_PIN, HIGH);
-  fastDigitalWrite(GREEN_PIN, LOW);
-  fastDigitalWrite(BLUE_PIN, HIGH); 
+  fastDigitalWrite(RED_PIN, r);
+  fastDigitalWrite(GREEN_PIN, g);
+  fastDigitalWrite(BLUE_PIN, b); 
 }

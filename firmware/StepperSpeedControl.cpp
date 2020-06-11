@@ -36,7 +36,6 @@ void stepper_setup()
 
   memset(&stp, 0, sizeof(stp_t));
   set_acceleration(DEFAULT_ACCEL);
-  stp.i = 1;
 }
 
 void enable_stepper()
@@ -59,11 +58,9 @@ static void set_delay(long microseconds) {
   // check 
   if(microseconds > 0) {
     if(microseconds < MIN_DELAY) microseconds = MIN_DELAY;
-    stp.i = 1;
   }
   else if(microseconds < 0) {
     if(microseconds > -MIN_DELAY) microseconds = -MIN_DELAY;
-    stp.i = -1;
   }
 
   if(stp.ms != microseconds) {
@@ -137,6 +134,9 @@ void home_stop()
     emergency_stop();
     stp.p = 0;
   }
+  else if(stp.ms == 0) {
+    stp.p = 0;    
+  }
 }
 
 void emergency_stop()
@@ -171,6 +171,6 @@ void set_speed(float r, unsigned d)
 }
 
 void move_to_position(long p, float rpm, bool wait)
-{ 
-  move_n_steps(p - stp.p, rpm, wait); 
+{
+  if(p != stp.p) move_n_steps(p - stp.p, rpm, wait); 
 }

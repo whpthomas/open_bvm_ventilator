@@ -36,10 +36,20 @@ void timer1_setup()
 
 ISR(TIMER1_COMPA_vect)
 {
-  fastDigitalWrite(STEP_PIN, HIGH);
+  unsigned long cycles;
+  unsigned short ticks;
+  unsigned char selectBits;
+
+#ifdef INVERT_STEP_DIRECTION      
+  if(fastDigitalRead(DIR_PIN)) stp.p--; else stp.p++;
+#else
+  if(fastDigitalRead(DIR_PIN)) stp.p++; else stp.p--;
+#endif
 
   stp.c++;
-  stp.p += stp.i;
+  fastDigitalWrite(STEP_PIN, HIGH);
+  fastDigitalWrite(STEP_PIN, LOW);
+
   
   if(stp.td >= stp.c1 && stp.d >= stp.c1) { // instant rpm
     // if target delay zero
@@ -49,7 +59,7 @@ ISR(TIMER1_COMPA_vect)
       stp.atTargetRpm = true; // target speed reached
       stp.done = true;
       timer1_stop();  // stop timer
-      goto L_RETURN;
+      return;
     }
     else if(stp.d != stp.td) { // instant start
       stp.n = 1;      // set ramp count 
@@ -73,13 +83,80 @@ ISR(TIMER1_COMPA_vect)
       stp.atTargetRpm = true; // target speed reached
     }
   }
-  set_timer1(stp.d);
+
+  cycles = (F_CPU / 1000000 * stp.d);
+  
+  if (cycles < TIMER1_RESOLUTION) {
+    selectBits = (1 << CS10);
+    ticks = cycles;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 8) {
+    selectBits = (1 << CS11);
+    ticks = cycles / 8;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 64) {
+    selectBits = (1 << CS11) | (1 << CS10);
+    ticks = cycles / 64;
+    
+  }
+  else if (cycles < TIMER1_RESOLUTION * 256) {
+    selectBits = (1 << CS12);
+    ticks = cycles / 256;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 1024) {
+    selectBits = (1 << CS12) | (1 << CS10);
+    ticks = cycles / 1024;
+  } 
+  else {
+    selectBits = (1 << CS12) | (1 << CS10);
+    ticks = TIMER1_RESOLUTION - 1;
+  }
+
+  OCR1A = ticks;
+  TCCR1B = selectBits | (1 << WGM12); // CTC mode
   
   if(stp.ms && stp.c >= stp.tc - stp.n) { // ramp down step count
     stp.ms = 0; // signal ramp down
     stp.td = stp.c0; // target delay is c0
     stp.atTargetRpm = false;
   }
-L_RETURN:
-  fastDigitalWrite(STEP_PIN, LOW);
+}
+
+void set_timer1(unsigned long microseconds) { 
+  unsigned long cycles;
+  unsigned short ticks;
+  unsigned char selectBits;
+
+  cycles = (F_CPU / 1000000 * microseconds);
+  
+  if (cycles < TIMER1_RESOLUTION) {
+    selectBits = (1 << CS10);
+    ticks = cycles;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 8) {
+    selectBits = (1 << CS11);
+    ticks = cycles / 8;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 64) {
+    selectBits = (1 << CS11) | (1 << CS10);
+    ticks = cycles / 64;
+    
+  }
+  else if (cycles < TIMER1_RESOLUTION * 256) {
+    selectBits = (1 << CS12);
+    ticks = cycles / 256;
+  }
+  else if (cycles < TIMER1_RESOLUTION * 1024) {
+    selectBits = (1 << CS12) | (1 << CS10);
+    ticks = cycles / 1024;
+  } 
+  else {
+    selectBits = (1 << CS12) | (1 << CS10);
+    ticks = TIMER1_RESOLUTION - 1;
+  }
+  
+  noInterrupts();
+  OCR1A = ticks;
+  TCCR1B = selectBits | (1 << WGM12); // CTC mode
+  interrupts();
 }

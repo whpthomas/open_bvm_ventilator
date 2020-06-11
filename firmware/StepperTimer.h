@@ -23,40 +23,6 @@
 
 #define TIMER1_RESOLUTION 65536UL
 
-static inline void set_timer1(unsigned long microseconds) { 
-  const unsigned long cycles = (F_CPU / 1000000 * microseconds);
-  unsigned short ticks;
-  unsigned char selectBits;
-  
-  if (cycles < TIMER1_RESOLUTION) {
-    selectBits  = (1 << CS10);
-    ticks = cycles;
-  }
-  else if (cycles < TIMER1_RESOLUTION * 8) {
-    selectBits  = (1 << CS11);
-    ticks = cycles / 8;
-  }
-  else if (cycles < TIMER1_RESOLUTION * 64) {
-    selectBits  = (1 << CS11) | (1 << CS10);
-    ticks = cycles / 64;
-    
-  }
-  else if (cycles < TIMER1_RESOLUTION * 256) {
-    selectBits  = (1 << CS12);
-    ticks = cycles / 256;
-  }
-  else if (cycles < TIMER1_RESOLUTION * 1024) {
-    selectBits  = (1 << CS12) | (1 << CS10);
-    ticks = cycles / 1024;
-  } 
-  else {
-    selectBits  = (1 << CS12) | (1 << CS10);
-    ticks = TIMER1_RESOLUTION - 1;
-  }
-  OCR1A = ticks;
-  TCCR1B = selectBits | (1 << WGM12); // CTC mode
-}
-
 static inline void timer1_start()
 {
   TIMSK1 |=  (1 << OCIE1A);
@@ -68,3 +34,4 @@ static inline void timer1_stop()
 }
 
 void timer1_setup();
+void set_timer1(unsigned long microseconds);

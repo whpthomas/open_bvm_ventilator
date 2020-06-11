@@ -36,6 +36,8 @@ limit_t limit;
 ctrl_t ctrl;
 live_t live;
 
+void live_setup();
+
 void ctrl_setup()
 {
   alarm = NO_ALARM;
@@ -44,7 +46,11 @@ void ctrl_setup()
 
   EEPROM.get(0, ctrl);
   EEPROM.get(sizeof(ctrl_t), limit);
+  live_setup();
+}
 
+void live_setup()
+{
   live_full_press_steps();
   live_breath_cycle_time();
   live_inspiratory_time();
@@ -90,7 +96,7 @@ void ctrl_full_press_volume(unsigned value) {
  */
 
 void ctrl_tidal_volume(unsigned value) {
-  ctrl.tidalVolume = value;
+  live.volume = ctrl.tidalVolume = value;
   //DebugMessage("ctrl.tidalVolume = ", ctrl.tidalVolume);
   live_tital_end_position();
   live_minute_ventilation();
@@ -197,8 +203,9 @@ void live_inspiratory_time() {
 /* INSPIRATORY TIME
  * Calculated tidal volume
  */
-void live_volume() {
-  live.volume = ((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps;
+unsigned volume_ml() {
+  unsigned v = ((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps;
+  return v > 225 ?  (v * 2) - 550 : 0;  
 }
 
 /* MINUTE VENTILATION
@@ -215,7 +222,8 @@ void live_minute_ventilation() {
  */
 
 unsigned tidal_steps(unsigned volume) {
-  return ((unsigned long)live.fullPressSteps * volume) / ctrl.fullPressVolume;
+  unsigned v = volume + 275 - (volume / 2);
+  return ((unsigned long)live.fullPressSteps * v) / ctrl.fullPressVolume;
 }
 
 void live_tital_end_position() { 
@@ -263,7 +271,7 @@ int clamp_input_value(int value, int step, int8_t dir, int lo, int hi) {
   return value;
 }
 
-void alarm_event(alarm_t a)
+void trigger_alarm(alarm_t a)
 {
   if(alarm != a) {
     alarm = a;
@@ -298,13 +306,7 @@ void factory_reset()
   limit.minimum.volume = DEFAULT_MINIMUM_VOLUME;
   limit.maximum.volume = DEFAULT_MAXIMUM_VOLUME;
 
-  live_full_press_steps();
-  live_breath_cycle_time();
-  live_inspiratory_time();
-  live_minute_ventilation();
-
-  live.volume = ctrl.tidalVolume;
-  live.pressure = ctrl.plateauAirwayPressure;
+  live_setup();
   
   EEPROM.put(0, ctrl);
   EEPROM.put(sizeof(ctrl_t), limit);

@@ -75,7 +75,7 @@ void setup() {
   fastPinMode(HOME_ENDSTOP_PIN, INPUT_PULLUP);
   phase = HOME_PHASE;
 
-  if(ctrl.ventilationActive) alarm_event(POWER_FAILURE_ALARM);
+  if(ctrl.ventilationActive) trigger_alarm(POWER_FAILURE_ALARM);
 }
 
 void loop()
@@ -358,25 +358,19 @@ void loop()
     //IF_DEBUG( debug.println("home endstop"); )
     switch(phase) {
       case HOME_PHASE:
-        blue_led();
-        phase = ZERO_PHASE;
-        enable_stepper();
-        home_stop();
-        live.zeroPressure = read_pressure();
-        move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
-        break;
       case ENDSTOP_PHASE:
-        green_led();
+      case TRIGGER_PHASE:
+        if(!alarm) green_led();
         phase = ZERO_PHASE;
         enable_stepper();
         home_stop();
         live.zeroPressure = read_pressure();
         move_to_position(ctrl.startPosition, live.expiratoryRpm, false);
         break;
-      case ZERO_PHASE:
+      case NO_PHASE:
+        phase = HOME_PHASE;
         break;
       default:
-        phase = HOME_PHASE;
         break;
     }
     redraw = true;
@@ -415,7 +409,7 @@ void loop()
       if(!ctrl.ventilationActive) break;
       enable_stepper();
       lastBreathCycle = now - live.breathCycleTime;
-      green_led();
+      if(!alarm) green_led();
       redraw = true;
       // fall through
 
@@ -459,12 +453,12 @@ void loop()
         if(!alarm) cyan_led();
         if(inspiratoryTimer < now) {
           if(!alarm) magenta_led();
-          live.volume = ((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps;
+          live_volume();
           phase = EXPIRATORY_PHASE;
           redraw = true;
           int ip = live.pressure - live.zeroPressure;
           if(ip >= 0 && ip < limit.minimum.pressure) {
-            alarm_event(UNDER_PRESSURE_ALARM);
+            trigger_alarm(UNDER_PRESSURE_ALARM);
           }
         }
       }
@@ -476,23 +470,27 @@ void loop()
       redraw = true;
       break;
   }
+
+  /* CHECK LIMITS
+   * If operating outside limits trigger alarm
+   */  
   
   if(live.peakPressure > limit.maximum.pressure) {
-    alarm_event(OVER_PRESSURE_ALARM);
+    trigger_alarm(OVER_PRESSURE_ALARM);
   }
 
   if(live.volume < limit.minimum.volume) {
-    alarm_event(UNDER_VOLUME_ALARM);
+    trigger_alarm(UNDER_VOLUME_ALARM);
   }
   else if(live.volume > limit.maximum.volume) {
-    alarm_event(OVER_VOLUME_ALARM);
+    trigger_alarm(OVER_VOLUME_ALARM);
   }
 
   if(live.minuteVentilation < limit.minimum.ventilation) {
-    alarm_event(UNDER_VENTILATION_ALARM);
+    trigger_alarm(UNDER_VENTILATION_ALARM);
   }
   else if(live.minuteVentilation > limit.maximum.ventilation) {
-    alarm_event(OVER_VENTILATION_ALARM);
+    trigger_alarm(OVER_VENTILATION_ALARM);
   }
   
   /* REDRAW
@@ -555,13 +553,13 @@ void check_pressure()
 
 void graph_pressure()
 {
-  unsigned v = (((stp.p - ctrl.startPosition) * ctrl.fullPressVolume) / live.fullPressSteps) / 48;
+  unsigned v = volume_ml() / 50;
   if(v > 10) v = 10;
   graph.volume[graph.index & GRAPH_MASK] = v;
-  
-  int p = (live.pressure - live.zeroPressure) / 4;
-  if(p > 27) p = 27;
-  if(p < -5) p = -5;
+
+  int p = (live.pressure - live.zeroPressure) / 12;
+  if(p > 30) p = 30;
+  if(p < -2) p = -2;
   graph.pressure[graph.index & GRAPH_MASK] = p;
   //DebugMessage("pressure = ", p);
   redraw = true;

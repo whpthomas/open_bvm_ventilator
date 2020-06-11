@@ -5,7 +5,7 @@
 This is a reference design and test platform for open source non-invasive bag valve mask ventilators. It features 3D printable parts and uses common off-the-shelf hardware and components.
 
 3D Printable files can be found here and on [Thingiverse](https://www.thingiverse.com/thing:4335859).
-Fusion 360 CAD files can be found here and on GrabCAD.
+Fusion 360 CAD files can be found here and on [GrabCAD](https://grabcad.com/library/open-bvm-ventilator-project-1).
 
 ## Specification
 

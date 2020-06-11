@@ -35,7 +35,6 @@ const float STEPS_PER_REVOLUTION = (360.0 / STEP_ANGLE * MICRO_STEPS);
 #define STEPS_PER_SECOND_TO_MICROS(sps) (1000000.0 / sps)
 
 struct stp_t {
-  volatile int8_t i;        // direction (1 or -1)
   volatile long p;          // current position
   volatile unsigned long c; // current step count
   volatile unsigned long tc;// target step count

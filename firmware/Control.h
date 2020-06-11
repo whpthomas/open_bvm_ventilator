@@ -210,7 +210,8 @@ void ctrl_pressure_trigger(unsigned value);
 void live_volume_per_revolution();
 void live_breath_cycle_time();
 void live_inspiratory_time();
-void live_volume();
+unsigned volume_ml();
+inline void live_volume() { live.volume = volume_ml(); }
 void live_minute_ventilation();
 void actual_minute_ventilation();
 void live_full_press_steps();
@@ -224,5 +225,5 @@ void live_second_position();
 
 int clamp_input_value(int value, int step, int8_t dir, int lo, int hi);
 
-void alarm_event(alarm_t alarm);
+void trigger_alarm(alarm_t alarm);
 void factory_reset();
