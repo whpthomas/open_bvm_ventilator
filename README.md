@@ -39,7 +39,7 @@ The current Open BVM Ventilator design has the following capabilities:
 * Airway pressure safety is set via the maximum pressure limit (Limits page / Pressure / Maximum).
 * Pressurised air is not required, therefore the unit can be operated outside of an ICU using only bottled oxygen and a power supply.
 * All ventilator controls are accessed via the LCD display, stop button and encoder on the [Reprap Discount Full Graphic Smart Controller](https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller).
-* Tidal Volume has been calibrated and verified.
+* Tidal Volume has been [calibrated and verified](spec/calibration.pdf).
 * Both visual and audible alarms are generated and logged on the Events page.
 * 12v power can be provided via an AC adapter or external battery.
 * All parts can be 3D printed with food safe PLA plastic.
